@@ -7,8 +7,11 @@ class RunCommand: BeakCommand {
     let name = "run"
     let shortDescription = "Run a function"
 
-    let function = OptionalParameter()
-    let functionArgs = OptionalCollectedParameter()
+    @Param
+    var function: String?
+    
+    @CollectedParam
+    var functionArgs: [String]
 
     let options: BeakOptions
 
@@ -20,11 +23,11 @@ class RunCommand: BeakCommand {
         var functionCall: String?
 
         // parse function call
-        if let functionName = function.value {
+        if let functionName = function {
             guard let function = beakFile.functions.first(where: { $0.name == functionName }) else {
                 throw BeakError.invalidFunction(functionName)
             }
-            functionCall = try FunctionParser.getFunctionCall(function: function, arguments: functionArgs.value)
+            functionCall = try FunctionParser.getFunctionCall(function: function, arguments: functionArgs)
         }
 
         // create package
@@ -35,10 +38,10 @@ class RunCommand: BeakCommand {
 
         // build package
         do {
-            _ = try capture("swift", arguments: ["build", "--disable-sandbox"], directory: packagePath.string)
+            _ = try Task.capture("swift", arguments: ["build", "--disable-sandbox"], directory: packagePath.string)
         } catch let error as CaptureError {
-            stderr <<< error.captured.rawStdout
-            stderr <<< error.captured.rawStderr
+            stderr <<< error.captured.stdout
+            stderr <<< error.captured.stderr
             throw error
         }
 

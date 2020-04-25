@@ -50,12 +50,12 @@ public struct FunctionParser {
             } else {
                 switch param.type {
                 case .bool:
-                    guard let converted = Bool.convert(from: value) else {
+                    guard let converted = Bool(input: value) else {
                         throw BeakError.conversionError(param, value)
                     }
                     value = converted.description
                 case .int:
-                    guard let converted = Int.convert(from: value) else {
+                    guard let converted = Int(input: value) else {
                         throw BeakError.conversionError(param, value)
                     }
                     value = converted.description

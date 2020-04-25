@@ -9,10 +9,10 @@ let package = Package(
         .library(name: "BeakCore", targets: ["BeakCore"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/jpsim/SourceKitten", from: "0.19.1"),
+        .package(url: "https://github.com/jpsim/SourceKitten", from: "0.29.0"),
         .package(url: "https://github.com/kylef/PathKit.git", from: "0.8.0"),
         .package(url: "https://github.com/kylef/Spectre.git", from: "0.8.0"),
-        .package(url: "https://github.com/jakeheis/SwiftCLI", from: "5.1.0"),
+        .package(url: "https://github.com/jakeheis/SwiftCLI", from: "6.0.1"),
     ],
     targets: [
         .target(
