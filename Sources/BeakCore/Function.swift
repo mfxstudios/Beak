@@ -1,6 +1,6 @@
 import Foundation
 
-public struct Function: Equatable, CustomStringConvertible {
+public struct Function {
 
     public let name: String
     public let params: [Param]
@@ -13,70 +13,22 @@ public struct Function: Equatable, CustomStringConvertible {
         self.throwing = throwing
         self.docsDescription = docsDescription
     }
+}
 
+extension Function: Hashable  {
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(name)
+        hasher.combine(params)
+        hasher.combine(throwing)
+        hasher.combine(docsDescription)
+    }
+}
+
+extension Function: CustomStringConvertible {
     public var description: String {
         let paramString = params.map { param in
             "\(param.unnamed ? "_ " : "")\(param.name): \(param.optionalType)\(param.defaultValue != nil ? " = \(param.defaultValue!)" : "")"
         }.joined(separator: ", ")
         return "\(name)(\(paramString))\(throwing ? " throws" : "")"
-    }
-
-    public struct Param: Equatable {
-        public let name: String
-        public let type: ParamType
-        public let optional: Bool
-        public let defaultValue: String?
-        public let description: String?
-        public let unnamed: Bool
-
-        public var required: Bool {
-            return defaultValue == nil
-        }
-
-        public init(name: String, type: ParamType, optional: Bool = false, defaultValue: String? = nil, unnamed: Bool = false, description: String? = nil) {
-            self.name = name
-            self.type = type
-            self.optional = optional
-            self.defaultValue = defaultValue
-            self.unnamed = unnamed
-            self.description = description
-        }
-
-        public enum ParamType: Equatable, CustomStringConvertible, ExpressibleByStringLiteral {
-            case bool
-            case int
-            case string
-            case other(String)
-
-            public init(stringLiteral value: String) {
-                self.init(string: value)
-            }
-
-            public init(string: String) {
-                switch string {
-                case "Bool": self = .bool
-                case "Int": self = .int
-                case "String": self = .string
-                default: self = .other(string)
-                }
-            }
-
-            public var description: String {
-                return string
-            }
-
-            public var string: String {
-                switch self {
-                case .bool: return "Bool"
-                case .int: return "Int"
-                case .string: return "String"
-                case let .other(type): return type
-                }
-            }
-        }
-
-        public var optionalType: String {
-            return type.string + (optional ? "?" : "")
-        }
     }
 }

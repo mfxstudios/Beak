@@ -97,7 +97,7 @@ public struct SwiftParser {
             }
             return Function.Param(
                 name: name,
-                type: Function.Param.ParamType(string: type),
+                type: Function.Param.Kind(string: type),
                 optional: optional,
                 defaultValue: defaultValue,
                 unnamed: unnamed,

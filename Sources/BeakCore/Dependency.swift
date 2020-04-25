@@ -1,6 +1,6 @@
 import Foundation
 
-public struct Dependency: Equatable {
+public struct Dependency {
     public let name: String
     public let package: String
     public let requirement: String
@@ -63,4 +63,13 @@ public struct Dependency: Equatable {
         return ".\(type)(\(version))"
     }
 
+}
+
+extension Dependency: Hashable {
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(name)
+        hasher.combine(package)
+        hasher.combine(requirement)
+        hasher.combine(libraries)
+    }
 }
