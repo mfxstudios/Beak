@@ -3,20 +3,29 @@ import PathKit
 import SourceKittenFramework
 
 public struct BeakFile: Equatable {
-    public let contents: String
+    
     public let includedFiles: [BeakFile]
     
+    private let ownContents: String
     private let ownDependencies: [Dependency]
     private let ownFunctions: [Function]
+    private var includedContents: Set<String> {
+        let contents: [String] = includedFiles.reduce([]) { $0 + Array($1.includedContents) }
+        return Set(contents)
+    }
     
-    public var dependencies: Set<Dependency> {
+    public var contents: String {
+        return (Array(includedContents) + [ownContents]).joined(separator: "\n")
+    }
+    
+    public var dependencies: [Dependency] {
         let includedFilesDependencies: [Dependency] = includedFiles.reduce([]) { $0 + Array($1.dependencies) }
-        return Set(includedFilesDependencies + ownDependencies)
+        return includedFilesDependencies + ownDependencies
     }
 
-    public var functions: Set<Function> {
+    public var functions: [Function] {
         let includedFilesFunctions: [Function] = includedFiles.reduce([]) { $0 + Array($1.functions) }
-        return Set(includedFilesFunctions + ownFunctions)
+        return includedFilesFunctions + ownFunctions
     }
 
     public init(path: Path) throws {
@@ -32,7 +41,7 @@ public struct BeakFile: Equatable {
     }
 
     public init(contents: String, parent: BeakFile? = nil) throws {
-        self.contents = contents
+        self.ownContents = contents
         self.ownFunctions = try SwiftParser.parseFunctions(file: contents)
         self.ownDependencies = contents
             .split(separator: "\n")
@@ -53,7 +62,7 @@ public struct BeakFile: Equatable {
     }
 
     public init(contents: String, dependencies: [Dependency], functions: [Function], includedFiles: [BeakFile]) {
-        self.contents = contents
+        self.ownContents = contents
         self.ownDependencies = dependencies
         self.ownFunctions = functions
         self.includedFiles = includedFiles

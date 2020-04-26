@@ -15,15 +15,7 @@ public struct Function {
     }
 }
 
-extension Function: Hashable  {
-    public func hash(into hasher: inout Hasher) {
-        hasher.combine(name)
-        hasher.combine(params)
-        hasher.combine(throwing)
-        hasher.combine(docsDescription)
-    }
-}
-
+extension Function: Equatable  {}
 extension Function: CustomStringConvertible {
     public var description: String {
         let paramString = params.map { param in
