@@ -2,20 +2,17 @@ import Foundation
 import PathKit
 import SourceKittenFramework
 
-public struct BeakFile: Equatable {
+public struct BeakFile {
     
     public let includedFiles: [BeakFile]
     
     private let ownContents: String
     private let ownDependencies: [Dependency]
     private let ownFunctions: [Function]
-    private var includedContents: Set<String> {
-        let contents: [String] = includedFiles.reduce([]) { $0 + Array($1.includedContents) }
-        return Set(contents)
-    }
-    
+
     public var contents: String {
-        return (Array(includedContents) + [ownContents]).joined(separator: "\n")
+        let includedContents: [String] = includedFiles.reduce([]) { $0 + [$1.contents] }
+        return Array(Set(includedContents + [ownContents])).joined(separator: "\n")
     }
     
     public var dependencies: [Dependency] {
@@ -66,5 +63,12 @@ public struct BeakFile: Equatable {
         self.ownDependencies = dependencies
         self.ownFunctions = functions
         self.includedFiles = includedFiles
+    }
+}
+
+extension BeakFile: Hashable {
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(contents)
+        hasher.combine(includedFiles)
     }
 }

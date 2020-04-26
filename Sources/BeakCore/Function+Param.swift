@@ -1,7 +1,7 @@
 import Foundation
 
 extension Function {
-    public struct Param: Equatable {
+    public struct Param: Hashable {
         public let name: String
         public let type: Kind
         public let optional: Bool
@@ -25,11 +25,20 @@ extension Function {
         public var optionalType: String {
             return type.string + (optional ? "?" : "")
         }
+        
+        public func hash(into hasher: inout Hasher) {
+            hasher.combine(name)
+            hasher.combine(type)
+            hasher.combine(optional)
+            hasher.combine(defaultValue)
+            hasher.combine(description)
+            hasher.combine(unnamed)
+        }
     }
 }
 
 extension Function.Param {
-    public enum Kind: Equatable, CustomStringConvertible, ExpressibleByStringLiteral {
+    public enum Kind: Hashable, CustomStringConvertible, ExpressibleByStringLiteral {
         case bool
         case int
         case string

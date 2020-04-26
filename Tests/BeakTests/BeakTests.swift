@@ -280,10 +280,14 @@ class BeakTests: XCTestCase {
                 let package = PackageManager.createPackage(name: "Test", beakFile: beakFile)
 
                 let expectedPackage = """
-                // swift-tools-version:4.0
+                // swift-tools-version:5.2
                 import PackageDescription
+
                 let package = Package(
                     name: "Test",
+                    platforms: [
+                        .macOS(.v10_13),
+                    ],
                     dependencies: [
                         .package(url: "https://github.com/name/repo.git", .exact("4.2.0")),
                         .package(url: "https://github.com/name/repo2.git", .branch("v4")),
