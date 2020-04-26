@@ -68,7 +68,11 @@ public struct Dependency {
     }
     
     public func librariesOutput() -> [String] {
-        guard libraries.count > 1 else { return libraries.map { $0.quoted } }
+        if libraries.count == 1,
+           let lib = libraries.first,
+           lib == name {
+            return libraries.map { $0.quoted }
+        }
         return libraries.map { ".product(name: \($0.quoted), package: \(name.quoted))" }
     }
 
