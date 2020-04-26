@@ -42,9 +42,8 @@ public class PackageManager {
     }
 
     public static func createPackage(name: String, beakFile: BeakFile) -> String {
-        let dependecies = Set(beakFile.dependencies.map { ".package(url: \($0.package.quoted), \($0.requirement))," })
-        let dependenciesString = Array(dependecies).joined(separator: "\n        ")
-        let librariesString = beakFile.libraries.map { "\($0.quoted)," }.joined(separator: "\n                ")
+        let dependenciesString = beakFile.dependencies.map { ".package(url: \($0.package.quoted), \($0.requirement))," }.removingDuplicates().joined(separator: "\n        ")
+        let librariesString = beakFile.libraries.map { "\($0.quoted)," }.removingDuplicates().joined(separator: "\n                ")
         return """
         // swift-tools-version:5.2
         import PackageDescription
@@ -70,7 +69,7 @@ public class PackageManager {
     }
 }
 
-extension Path {
+fileprivate extension Path {
 
     func writeIfUnchanged(_ string: String) throws {
         if let existingContent: String = try? read() {
@@ -79,5 +78,19 @@ extension Path {
             }
         }
         try write(string)
+    }
+}
+
+fileprivate extension Array where Element: Hashable {
+    func removingDuplicates() -> [Element] {
+        var addedDict = [Element: Bool]()
+
+        return filter {
+            addedDict.updateValue(true, forKey: $0) == nil
+        }
+    }
+
+    mutating func removeDuplicates() {
+        self = self.removingDuplicates()
     }
 }

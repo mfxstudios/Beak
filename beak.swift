@@ -2,6 +2,8 @@
 // beak: sharplet/Regex @ 2.0.0
 // beak: kylef/PathKit @ 1.0.0
 
+// include: beak2.swift
+
 import Foundation
 import SwiftShell
 import Regex

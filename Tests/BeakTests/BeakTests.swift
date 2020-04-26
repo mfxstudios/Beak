@@ -129,13 +129,15 @@ class BeakTests: XCTestCase {
 
                 let beakFile = try BeakFile(contents: file)
                 let beakFile2 = try BeakFile(contents: file2)
-                try expect(beakFile.dependencies) == dependencies
-                try expect(beakFile2.dependencies) == dependencies
+                try expect(beakFile.dependencies.elementsEqual(dependencies)).beTrue()
+                try expect(beakFile2.dependencies.elementsEqual(dependencies)).beTrue()
             }
 
             $0.it("parses beak file") {
                 let path = Path(#file) + "../../../beak.swift"
+                let path2 = Path(#file) + "../../../beak2.swift"
                 let contents: String = try path.read()
+                let contents2: String = try path2.read()
                 let beakFile = try BeakFile(path: path)
 
                 let expectedBeakFile = BeakFile(
@@ -144,19 +146,19 @@ class BeakTests: XCTestCase {
                         Dependency(
                             name: "SwiftShell",
                             package: "https://github.com/kareman/SwiftShell.git",
-                            requirement: ".exact(\"4.0.0\")",
+                            requirement: ".exact(\"5.0.0\")",
                             libraries: ["SwiftShell"]
                         ),
                         Dependency(
                             name: "Regex",
                             package: "https://github.com/sharplet/Regex.git",
-                            requirement: ".exact(\"1.1.0\")",
+                            requirement: ".exact(\"2.0.0\")",
                             libraries: ["Regex"]
                         ),
                         Dependency(
                             name: "PathKit",
                             package: "https://github.com/kylef/PathKit.git",
-                            requirement: ".exact(\"0.8.0\")",
+                            requirement: ".exact(\"1.0.0\")",
                             libraries: ["PathKit"]
                         ),
                     ],
@@ -213,7 +215,43 @@ class BeakTests: XCTestCase {
                             docsDescription: "Releases a new version of Beak"
                         ),
                     ],
-                    includedFiles: []
+                    includedFiles: [
+                        BeakFile(
+                            contents: contents2,
+                            dependencies: [
+                                Dependency(
+                                    name: "SwiftShell",
+                                    package: "https://github.com/kareman/SwiftShell.git",
+                                    requirement: ".exact(\"5.0.0\")",
+                                    libraries: ["SwiftShell"]
+                                ),
+                                Dependency(
+                                    name: "PathKit",
+                                    package: "https://github.com/kylef/PathKit.git",
+                                    requirement: ".exact(\"1.0.0\")",
+                                    libraries: ["PathKit"]
+                                ),
+                            ],
+                            functions: [
+                                Function(
+                                    name: "runAI",
+                                    params: [
+                                        Function.Param(
+                                            name: "mlData",
+                                            type: .string,
+                                            optional: false,
+                                            defaultValue: nil,
+                                            unnamed: false,
+                                            description: nil
+                                        ),
+                                    ],
+                                    throwing: false,
+                                    docsDescription: nil
+                                ),
+                            ],
+                            includedFiles: []
+                        )
+                    ]
                 )
 
                 try expect(beakFile) == expectedBeakFile
@@ -276,7 +314,10 @@ class BeakTests: XCTestCase {
                     .init(name: "repo3", package: "https://github.com/name2/repo3.git", requirement: ".exact(\"4.3.0\")", libraries: ["repo3"]),
                 ]
 
-                let beakFile = BeakFile(contents: "", dependencies: dependencies, functions: [], includedFiles: [])
+                let beakFile = BeakFile(contents: "", dependencies: dependencies, functions: [], includedFiles:
+                    [
+                        BeakFile(contents: "", dependencies: dependencies, functions: [], includedFiles: [])
+                ])
                 let package = PackageManager.createPackage(name: "Test", beakFile: beakFile)
 
                 let expectedPackage = """
