@@ -62,6 +62,15 @@ public struct Dependency {
         }
         return ".\(type)(\(version))"
     }
+    
+    public func dependencyOutput() -> String {
+        ".package(url: \(package.quoted), \(requirement))"
+    }
+    
+    public func librariesOutput() -> [String] {
+        guard libraries.count > 1 else { return libraries.map { $0.quoted } }
+        return libraries.map { ".product(name: \($0.quoted), package: \(name.quoted))" }
+    }
 
 }
 

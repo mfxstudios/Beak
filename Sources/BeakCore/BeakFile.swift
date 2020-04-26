@@ -13,7 +13,7 @@ public struct BeakFile {
     
     public var contents: String {
         let includedContents: [String] = includedFiles.reduce([]) { $0 + [$1.contents] }
-        return Array(Set(includedContents + [ownContents])).joined(separator: "\n")
+        return Array(Set(includedContents + [ownContents])).joined(separator: "\n\n/// --\n\n")
     }
     
     public var dependencies: [Dependency] {
@@ -35,7 +35,7 @@ public struct BeakFile {
     }
 
     public var libraries: [String] {
-        return dependencies.reduce([]) { $0 + $1.libraries }
+        return dependencies.reduce([]) { $0 + $1.librariesOutput() }
     }
 
     public init(contents: String, path: Path? = nil) throws {

@@ -339,8 +339,8 @@ class BeakTests: XCTestCase {
                             name: "Test",
                             dependencies: [
                                 "repo",
-                                "lib1",
-                                "lib2",
+                                .product(name: "lib1", package: "repo2"),
+                                .product(name: "lib2", package: "repo2"),
                                 "repo3",
                             ]
                         )
