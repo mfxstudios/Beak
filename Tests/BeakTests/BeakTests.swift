@@ -109,20 +109,20 @@ class BeakTests: XCTestCase {
 
                 let file = """
                 #!/usr/bin/env beak --path
-                // beak: name/repo@4.2.0
+                // beak: name/repo(Repo)@4.2.0
                 // beak: https://github.com/name/repo2.git lib1 lib2 @ branch:v4
                 // beak: name2/repo3 @ exact:4.3.0
                 // other comment in beak file
                 """
 
                 let file2 = """
-                // beak: name/repo@4.2.0
+                // beak: name/repo(Repo)@4.2.0
                 // beak: https://github.com/name/repo2.git lib1 lib2 @ branch:v4
                 // beak: name2/repo3 @ exact:4.3.0
                 """
 
                 let dependencies: [Dependency] = [
-                    .init(name: "repo", package: "https://github.com/name/repo.git", requirement: ".exact(\"4.2.0\")", libraries: ["repo"]),
+                    .init(name: "repo(Repo)", package: "https://github.com/name/repo.git", requirement: ".exact(\"4.2.0\")", libraries: ["repo"]),
                     .init(name: "repo2", package: "https://github.com/name/repo2.git", requirement: ".branch(\"v4\")", libraries: ["lib1", "lib2"]),
                     .init(name: "repo3", package: "https://github.com/name2/repo3.git", requirement: ".exact(\"4.3.0\")", libraries: ["repo3"]),
                 ]
@@ -309,7 +309,7 @@ class BeakTests: XCTestCase {
             $0.it("writes package") {
 
                 let dependencies: [Dependency] = [
-                    .init(name: "repo", package: "https://github.com/name/repo.git", requirement: ".exact(\"4.2.0\")", libraries: ["repo"]),
+                    .init(name: "repo(Repo)", package: "https://github.com/name/repo.git", requirement: ".exact(\"4.2.0\")", libraries: ["repo"]),
                     .init(name: "repo2", package: "https://github.com/name/repo2.git", requirement: ".branch(\"v4\")", libraries: ["lib1", "lib2"]),
                     .init(name: "repo3", package: "https://github.com/name2/repo3.git", requirement: ".exact(\"4.3.0\")", libraries: ["repo3"]),
                 ]
@@ -330,7 +330,7 @@ class BeakTests: XCTestCase {
                         .macOS(.v10_13),
                     ],
                     dependencies: [
-                        .package(url: "https://github.com/name/repo.git", .exact("4.2.0")),
+                        .package(name: "Repo", url: "https://github.com/name/repo.git", .exact("4.2.0")),
                         .package(url: "https://github.com/name/repo2.git", .branch("v4")),
                         .package(url: "https://github.com/name2/repo3.git", .exact("4.3.0")),
                     ],
@@ -338,7 +338,7 @@ class BeakTests: XCTestCase {
                         .target(
                             name: "Test",
                             dependencies: [
-                                "repo",
+                                .product(name: "repo", package: "Repo"),
                                 .product(name: "lib1", package: "repo2"),
                                 .product(name: "lib2", package: "repo2"),
                                 "repo3",

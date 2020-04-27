@@ -5,7 +5,9 @@ public struct Dependency {
     public let package: String
     public let requirement: String
     public let libraries: [String]
-
+    
+    private var usePackageName: Bool
+    
     public init(string: String) {
         let versionSplit = string
             .split(separator: "@")
@@ -26,21 +28,45 @@ public struct Dependency {
 
     public init(package: String, version: String, libraries: [String]? = nil) {
         self.package = Dependency.getPackage(name: package)
+        self.requirement = Dependency.getRequirement(version: version)
+        
         let name = String(package.split(separator: "/").last!.split(separator: ".").first!)
-        self.name = name
-        requirement = Dependency.getRequirement(version: version)
-        self.libraries = libraries ?? [name]
+        
+        if name.contains("(") && name.contains(")") {
+            let packageName = String(name.split(separator: "(").last!.dropLast())
+            let libraryName = String(name.split(separator: "(").first!)
+            
+            self.name = packageName
+            self.libraries = libraries ?? [libraryName]
+            self.usePackageName = true
+        } else {
+            self.name = name
+            self.libraries = libraries ?? [name]
+            self.usePackageName = false
+        }
     }
 
     public init(name: String, package: String, requirement: String, libraries: [String]) {
         self.package = package
-        self.name = name
         self.requirement = requirement
         self.libraries = libraries
+        
+        if name.contains("(") && name.contains(")") {
+            self.name = String(name.split(separator: "(").last!.dropLast())
+            self.usePackageName = true
+        } else {
+            self.name = name
+            self.usePackageName = false
+        }
     }
 
     public static func getPackage(name: String) -> String {
         if name.split(separator: "/").count == 2 {
+            if name.contains("(") {
+                let parsed = String(name.split(separator: "(").first!)
+                return "https://github.com/\(parsed).git"
+            }
+            
             return "https://github.com/\(name).git"
         } else {
             return name
@@ -64,7 +90,11 @@ public struct Dependency {
     }
     
     public func dependencyOutput() -> String {
-        ".package(url: \(package.quoted), \(requirement))"
+        if usePackageName {
+            return ".package(name: \(name.quoted), url: \(package.quoted), \(requirement))"
+        }
+        
+        return ".package(url: \(package.quoted), \(requirement))"
     }
     
     public func librariesOutput() -> [String] {
